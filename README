@@ -1,3 +1,8 @@
+# Design Space Exploration for Cacti
+## Prerequisite
+Python, Jinja2, Numpy
+## Usage
+`python cache_dse.py`
 -----------------------------------------------------------
 
 
