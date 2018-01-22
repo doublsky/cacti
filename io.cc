@@ -1336,7 +1336,7 @@ uca_org_t cacti_interface(const string & infile_name)
   solve(&fin_res);
 
   output_UCA(&fin_res);
-  output_data_csv(fin_res, infile_name + ".out");
+  output_data_csv(fin_res, infile_name + ".csv");
 
 
   // Memcad Optimization
@@ -2562,8 +2562,11 @@ void output_data_csv(const uca_org_t & fin_res, string fn)
 //      file << "Refresh period (microsec), ";
 //      file << "DRAM array availability (%), ";
       file << "Dynamic search energy (nJ), ";
+      file << "Total search energy per bit (pJ/bit), ";
       file << "Dynamic read energy (nJ), ";
+      file << "Total read energy per bit (pJ/bit), ";
       file << "Dynamic write energy (nJ), ";
+      file << "Total write energy per bit (pJ/bit), ";
 //      file << "Tag Dynamic read energy (nJ), ";
 //      file << "Data Dynamic read energy (nJ), ";
 //      file << "Dynamic read power (mW), ";
@@ -2639,16 +2642,24 @@ void output_data_csv(const uca_org_t & fin_res, string fn)
 //    file << fin_res.data_array2->access_time*1e+9 << ", ";
 //    file << fin_res.data_array2->dram_refresh_period*1e+6 << ", ";
 //    file << fin_res.data_array2->dram_array_availability <<  ", ";
+
+    double static_power = fin_res.power.readOp.leakage + fin_res.power.readOp.gate_leakage;
+    double static_energy = static_power * fin_res.cycle_time*1e+9 * g_ip->nbanks;
+
     if (g_ip->fully_assoc || g_ip->pure_cam)
     {
     	file << fin_res.power.searchOp.dynamic*1e+9 << ", ";
+    	file << (fin_res.power.searchOp.dynamic*1e+9 + static_energy)*1000/g_ip->out_w << ", ";
     }
     	else
     {
     		file << "N/A" << ", ";
+    		file << "N/A" << ", ";
     }
     file << fin_res.power.readOp.dynamic*1e+9 << ", ";
+    file << (fin_res.power.readOp.dynamic*1e+9 + static_energy)*1000/g_ip->out_w << ", ";
     file << fin_res.power.writeOp.dynamic*1e+9 << ", ";
+    file << (fin_res.power.writeOp.dynamic*1e+9 + static_energy)*1000/g_ip->out_w << ", ";
 //    if (!(g_ip->fully_assoc || g_ip->pure_cam || g_ip->pure_ram))
 //        {
 //        	file << fin_res.tag_array2->power.readOp.dynamic*1e+9 << ", ";
